@@ -1,0 +1,10 @@
+@font-face {
+  font-family: w95; /* Windows 95 font style */
+  src: url(fonts/w95.woff);
+}
+
+body {
+  margin: 0;
+  font-family: w95, 'Times New Roman', Times, serif;
+}
+

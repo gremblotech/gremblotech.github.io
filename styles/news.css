@@ -1,0 +1,21 @@
+body {
+  background-color: white;
+}
+
+.blog {
+  margin: 10px 40px;
+  max-width: 600px;
+}
+
+.page-link {
+  color: blue;
+  text-decoration: underline;
+}
+
+.page-link:hover {
+  cursor: pointer;
+}
+
+.page-link:active {
+  color: red;
+}

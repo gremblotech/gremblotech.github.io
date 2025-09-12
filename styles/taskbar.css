@@ -1,0 +1,64 @@
+.taskbar{
+  color: black;
+  background-color: #d0d0d0;
+  height: 35px;
+  width: min(max(133vh, 650px), 100vw); /* Fits browser window or desktop size */
+  border-top: solid 2px white;
+  position: fixed;
+  bottom: 0;
+  display: flex;
+}
+
+.taskbar button {
+  font: 18px w95, Times;
+  background-color: #d0d0d0;
+  border: 2px solid white;
+}
+
+.start {
+  width: 80px;
+}
+
+.start button {
+  margin: 3px;
+  padding: 1px 10px;
+  border-right-color: #808080;
+  border-bottom-color: #808080; /* Outset */
+  font-weight: bold;
+}
+
+.start button:hover {
+  cursor: pointer;
+}
+
+.start button:active {
+  border-color: white;
+  border-top-color: #808080;
+  border-left-color: #808080; /* Inset */
+}
+
+.taskbar-space {
+  flex: 1;
+}
+
+.right-dock {
+  width: 100px;
+}
+
+.right-dock button{
+  width: 80px;
+  margin: 2px 3px;
+  padding: 2px 4px;
+  text-align: right;
+  float: right;
+  border-top-color: #808080;
+  border-left-color: #808080; /* Inset */
+}
+
+@keyframes blink {
+  50% {visibility: hidden;}
+}
+
+.blinker {
+  animation: blink 2s steps(1, start) infinite;
+}

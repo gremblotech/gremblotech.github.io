@@ -1,0 +1,47 @@
+body {
+  background-color: black; /* Black bars */
+  overflow: hidden; /* Window Lock */
+}
+
+.desktop {
+  margin: 0 auto;
+  background-color: teal;
+  height: 100vh;
+  width: max(133vh, 650px); /* 4:3 hack, min width 650, contains taskbar */
+}
+
+.margin-hack {
+  margin: 0;
+  height: 15px;
+  width: 100%;
+  padding: 0;
+} /* The black bar at the top refuses to go away unless I do this nonsense */
+
+.desktop-flex {
+  margin: 0 5px;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-flow: column wrap;
+  align-content: flex-start;
+  gap: 20px;
+}
+
+.desktop-icon {
+  width: 100px;
+  height: 90px;
+  cursor: pointer;
+}
+
+.desktop-icon img {
+  display: block;
+  margin: auto;
+  width: 55%;
+  
+}
+
+.desktop-icon p {
+  margin: 6px 0px;
+  text-align: center;
+  color: white;
+  font-size: 16px;
+}
