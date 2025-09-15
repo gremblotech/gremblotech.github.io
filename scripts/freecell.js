@@ -10,107 +10,110 @@ class Card {
   }
 }
 
-function makeDeck() {
-  let rank;
-  let suit;
-  let deck = [];
+class Deck {
+  constructor() {
+    let rank;
+    let suit;
+    this.deck = [];
 
-  for (let i = 0; i < 52; i++) {
-    rank = Math.floor(i / 4);
-    suit = i % 4;
-    deck.push(new Card(rank, suit)); //Makes deck with order SA, HA, CA, DA, etc.
+    for (let i = 0; i < 52; i++) {
+      rank = Math.floor(i / 4);
+      suit = i % 4;
+      this.deck.push(new Card(rank, suit)); //Makes deck with order SA, HA, CA, DA, etc.
+    }
   }
 
-  return deck;
+  shuffle() {
+    let r;
+
+    for (let i = this.deck.length - 1; i > 0; i--) {
+      r = Math.floor(Math.random() * (i + 1));
+      [this.deck[i], this.deck[r]] = [this.deck[r], this.deck[i]]; //Swaps deck[i] and deck[r]
+    } //Basic shuffle algorithm
+  }
 }
 
-function shuffleDeck(deck) {
-  let random;
+class GameTable {
+  constructor(deck) {
+    this.table = Array.from(Array(12), () => new Array(0)); //table[8-11] are free cells
+    this.solvedCells = [-1, -1, -1, -1]; //-1 is equivalent to an empty cell
 
-  for (let i = deck.length - 1; i > 0; i--) {
-    random = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[random]] = [deck[random], deck[i]];
-  } //Basic shuffle algorithm
-
-  return deck;
-}
-
-function makeGameTable(deck) {
-  let gameTable = Array.from(Array(16), () => new Array(0)); //gameTable indexes 8-11 are Free Cells
-  let column;
-
-  for (let i = 0; i < deck.length; i++) {
-    column = i % 8;
-    gameTable[column].push(deck[i]);
-  } //Does not populate Free Cells
-
-  return gameTable; //gameTable[n][0] acts as the frontmost card
-}
-
-function getFreeCells(gameTable) {
-  let freeCells = 0;
-
-  for (let i = 0; i < gameTable.length; i++) {
-    if (gameTable[i].length === 0) freeCells++;
+    let column;
+    for (let i = 0; i < 52; i++) {
+      column = i % 8;
+      this.table[column].push(deck.deck[i]);
+    } //Deals deck to starting game position
   }
 
-  return freeCells;
-}
-
-function isLegalMove(start, depth, end, gameTable) {
-  let freeCells = getFreeCells(gameTable);
-
-  if (depth > freeCells + 1) return false; //Is stack too large
-  if (gameTable[end].length === 0) return true; //Open cell always legal
-  if (end > 8) return false; //Not allow stacking on free cells
-
-  let startCard = gameTable[start][depth - 1];
-  let endCard = gameTable[end][0];
-
-  if (startCard.color === endCard.color) return false; //Illegal if same color
-  if (startCard.rank + 1 != endCard.rank) return false; //Illegal if not reducing rank
-
-  return true;
-}
-
-function isLegalStack(start, depth) {
-  let stack = [];
-  for (i = 0; i < depth; i++) {
-    stack[i] = gameTable[start][i];
+  getOpenCells() {
+    let openCells = 0;
+    for (let i = 0; i < 12; i++) {
+      if (this.table[i].length === 0) openCells++;
+    }
+    return openCells;
   }
 
-  for (let i = 0; i < stack.length - 1; i++) {
-    if (stack[i].color === stack[i + 1].color) return false;
-    if (stack[i].rank + 1 != stack[i + 1].rank) return false;
+  isLegalStack(start, depth) {
+    if (depth > this.getOpenCells() + 1) return false; //Check stack height
+
+    let stack = [];
+    for (let i = 0; i < depth; i++) {
+      stack.push(this.table[start][i]);
+    }
+
+    for (let i = 0; i < stack.length - 1; i++) {
+      if (stack[i].color === stack[i + 1].color) return false;
+      if (stack[i].rank + 1 != stack[i + 1].rank) return false;
+    }
+
+    return true;
   }
 
-  return true;
-}
+  isLegalMove(start, depth, end) {
+    if (end >= 8) {
+      if (depth === 1 && this.table[end].length === 0) return true;
+      else return false;
+    }
 
-function makeMove(start, depth, end, gameTable) {
-  if (start === end) return gameTable;
-  if (!isLegalStack(start, depth)) return gameTable;
-  if (!isLegalMove(start, depth, end, gameTable)) return gameTable;
+    if (this.table[end].length === 0) return true;
 
-  let stack = [];
-  for (i = 0; i < depth; i++) {
-    stack.push(gameTable[start].shift());
+    let startCard = this.table[start][depth - 1];
+    let endCard = this.table[end][0];
+
+    if (startCard.color === endCard.color) return false; //Illegal if same color
+    if (startCard.rank + 1 != endCard.rank) return false; //Illegal if not reducing rank
+
+    return true;
   }
-  for (i = 0; i < depth; i++) {
-    gameTable[end].unshift(stack.pop());
+
+  makeMove(start, depth, end) {
+    if (!this.isLegalStack(start, depth)) return false;
+    if (!this.isLegalMove(start, depth, end)) return false;
+
+    let stack = [];
+    for (let i = 0; i < depth; i++) {
+      stack.push(this.table[start].shift());
+    }
+    for (let i = 0; i < depth; i++) {
+      this.table[end].unshift(stack.pop());
+    }
+
+    return true;
   }
 
-  return gameTable;
+  solveCard(start) {
+    let startRank = this.table[start][0].rank;
+    let startSuit = this.table[start][0].suit;
+    let endRank = this.solvedCells[startSuit] + 1;
+    if (startRank != endRank) return false;
+
+    this.table[start].shift();
+    this.solvedCells[startSuit]++;
+
+    return true;
+  }
 }
 
-function solveCard(column, gameTable) {
-  if (
-    gameTable[column][0].rank !=
-    gameTable[gameTable[column][0].suit + 12].length
-  )
-    return gameTable;
-
-  gameTable[gameTable[column][0].suit + 12].unshift(gameTable[column].shift());
-
-  return gameTable;
-}
+let deck = new Deck();
+deck.shuffle();
+table = new GameTable(deck);
