@@ -35,8 +35,9 @@ class Deck {
 
 class GameTable {
   constructor(deck) {
-    this.table = Array.from(Array(12), () => new Array(0)); //table[8-11] are free cells
-    this.solvedCells = [-1, -1, -1, -1]; //-1 is equivalent to an empty cell
+    this.table = Array.from(Array(8), () => new Array(0));
+    this.freeCells = Array.from(Array(4), () => new Array(0));
+    this.solvedCells = Array.from(Array(4), () => new Array(0));
 
     let column;
     for (let i = 0; i < 52; i++) {
@@ -47,7 +48,7 @@ class GameTable {
 
   getOpenCells() {
     let openCells = 0;
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 8; i++) {
       if (this.table[i].length === 0) openCells++;
     }
     return openCells;
@@ -70,11 +71,6 @@ class GameTable {
   }
 
   isLegalMove(start, depth, end) {
-    if (end >= 8) {
-      if (depth === 1 && this.table[end].length === 0) return true;
-      else return false;
-    }
-
     if (this.table[end].length === 0) return true;
 
     let startCard = this.table[start][depth - 1];
@@ -84,7 +80,7 @@ class GameTable {
     if (startCard.rank + 1 != endCard.rank) return false; //Illegal if not reducing rank
 
     return true;
-  }
+  } //This is nonsense
 
   makeMove(start, depth, end) {
     if (!this.isLegalStack(start, depth)) return false;
@@ -104,11 +100,10 @@ class GameTable {
   solveCard(start) {
     let startRank = this.table[start][0].rank;
     let startSuit = this.table[start][0].suit;
-    let endRank = this.solvedCells[startSuit] + 1;
-    if (startRank != endRank) return false;
+    let endRank = this.solvedCells[startSuit].rank || -1;
+    if (startRank != endRank + 1) return false;
 
-    this.table[start].shift();
-    this.solvedCells[startSuit]++;
+    this.solvedCells[startSuit].unshift(this.table[start].shift());
 
     return true;
   }
