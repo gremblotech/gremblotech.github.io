@@ -51,42 +51,93 @@ const GRAVITYTABLE = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 49
 ]; // index 0 is top of field
 
-const MOVEMENTTABLE = [9, 7, 5, 3, 1, 0, 1, 3, 5, 7]; // number of frames required per column
+const MOVEMENTTABLE = [
+  [25, 19, 13, 7, 1, 0, 1, 7, 13, 19], // green, das no qt
+  [21, 15, 10, 6, 1, 0, 1, 6, 10, 15], // yellowgreen, das qt kinda
+  [16, 13, 9, 5, 1, 0, 1, 5, 9, 13], // yellow, up to abt 17hz on 29
+  [12, 9, 7, 4, 1, 0, 1, 4, 7, 9], // orange , up to 7 left 29 equiv
+  [9, 7, 5, 3, 1, 0, 1, 3, 5, 7], // red, frame perfect limit
+];
 
-let inputlevel = 9;
+const COLORS = {
+  gray: "#404040",
+  red: "#ff0000",
+  orange: "#ffa000",
+  yellow: "#ffff00",
+  yellowgreen: "#90ff00",
+  green: "#00ff00",
+};
+
+let inputlevel = 29;
 
 function _generateTotalFramesY(level) {
   let totalFramesY = new Array(20);
   totalFramesY[0] = 0;
-  try {
-    for (let i = 1; i < 20; i++) {
-      totalFramesY[i] = totalFramesY[i - 1] + GRAVITYTABLE[level][i - 1];
-    }
-  } catch (error) {
-    console.log(`Level ${level} out of bounds`);
-    return 0;
+  for (let i = 1; i < 20; i++) {
+    totalFramesY[i] = totalFramesY[i - 1] + GRAVITYTABLE[level][i - 1];
   }
 
   return totalFramesY;
 }
 
-function generateVisualizer(level) {
+function _generateVisualizer(level) {
   let totalFramesY = _generateTotalFramesY(level);
-  if (!totalFramesY) return 0;
 
   let visualizerTable = Array.from(Array(20), () => new Array(10));
 
   for (let y = 0; y < 20; y++) {
     for (let x = 0; x < 10; x++) {
-      visualizerTable[y][x] = totalFramesY[y] - MOVEMENTTABLE[x];
+      visualizerTable[y][x] = totalFramesY[y];
 
-      if (visualizerTable[y][x] < 0) visualizerTable[y][x] = -1;
+      if (visualizerTable[y][x] < MOVEMENTTABLE[4][x])
+        visualizerTable[y][x] = -1;
     }
   }
 
-  console.log(visualizerTable);
+  return visualizerTable;
+}
+
+function _getColor(frames, x) {
+  let colorindex = 5;
+  for (let i = 0; i < 5; i++) {
+    if (frames >= MOVEMENTTABLE[i][x]) {
+      colorindex = i;
+      break;
+    }
+  }
+  switch (colorindex) {
+    case 0:
+      return COLORS.green;
+    case 1:
+      return COLORS.yellowgreen;
+    case 2:
+      return COLORS.yellow;
+    case 3:
+      return COLORS.orange;
+    case 4:
+      return COLORS.red;
+    default:
+      return COLORS.gray;
+  }
+}
+
+function drawVisualizer(level) {
+  if (level < 9 || level > 49) {
+    return 0;
+  }
+
+  visualizerTable = _generateVisualizer(level);
+
+  let cellSize = 25;
+  let field = document.querySelector(".field");
+  let fieldctx = field.getContext("2d");
+
+  for (let y = 0; y < 20; y++) {
+    for (let x = 0; x < 10; x++) {
+      fieldctx.fillStyle = _getColor(visualizerTable[y][x], x);
+      fieldctx.fillRect(cellSize * x, cellSize * y, cellSize, cellSize);
+    }
+  }
 
   return 1;
 }
-
-generateVisualizer(9);
