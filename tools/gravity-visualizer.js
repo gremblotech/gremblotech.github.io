@@ -68,8 +68,6 @@ const COLORS = {
   green: "#00ff00",
 };
 
-let inputlevel = 29;
-
 function _generateTotalFramesY(level) {
   let totalFramesY = new Array(20);
   totalFramesY[0] = 0;
