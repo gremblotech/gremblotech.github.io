@@ -78,7 +78,7 @@ function _generateTotalFramesY(level) {
   return totalFramesY;
 }
 
-function _generatevisualizer(level) {
+function _generateVisualizer(level) {
   let totalFramesY = _generateTotalFramesY(level);
 
   let visualizerTable = Array.from(Array(20), () => new Array(10));
@@ -119,12 +119,12 @@ function _getColor(frames, x) {
   }
 }
 
-function drawvisualizer(level) {
+function drawVisualizer(level) {
   if (level < 9 || level > 49) {
     return 0;
   }
 
-  visualizerTable = _generatevisualizer(level);
+  visualizerTable = _generateVisualizer(level);
 
   let cellSize = 25;
   let field = document.querySelector(".field");
