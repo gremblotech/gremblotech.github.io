@@ -1,6 +1,7 @@
 body {
   overflow: hidden;
   background-color: #000070;
+  user-select: none;
 }
 
 .bingo-container {
